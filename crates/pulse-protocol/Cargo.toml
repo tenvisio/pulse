@@ -1,0 +1,24 @@
+[package]
+name = "pulse-protocol"
+description = "Wire protocol definitions for Pulse realtime engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+bytes = { workspace = true }
+serde = { workspace = true }
+serde_bytes = "0.11"
+serde_json = "1"
+rmp-serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[[bench]]
+name = "codec"
+harness = false
+

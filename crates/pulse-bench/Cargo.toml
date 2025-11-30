@@ -1,0 +1,36 @@
+[package]
+name = "pulse-bench"
+description = "Benchmarks for Pulse realtime engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+bench = false
+
+[dependencies]
+pulse-core = { workspace = true }
+pulse-protocol = { workspace = true }
+bytes = { workspace = true }
+criterion = { workspace = true }
+tokio = { workspace = true }
+tokio-tungstenite = { workspace = true }
+futures-util = { workspace = true }
+rmp-serde = { workspace = true }
+serde_json = "1"
+
+[[bench]]
+name = "throughput"
+harness = false
+
+[[bench]]
+name = "latency"
+harness = false
+
+[[bin]]
+name = "e2e_throughput"
+path = "src/bin/e2e_throughput.rs"
+

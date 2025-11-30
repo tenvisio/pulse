@@ -1,0 +1,74 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/pulse-core",
+    "crates/pulse-protocol",
+    "crates/pulse-transport",
+    "crates/pulse-server",
+    "crates/pulse-bench",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/tenvisio/pulse"
+homepage = "https://github.com/tenvisio/pulse"
+keywords = ["realtime", "websocket", "webtransport", "pubsub", "messaging"]
+categories = ["network-programming", "asynchronous", "web-programming"]
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Bytes and serialization
+bytes = "1"
+rmp-serde = "1"
+serde = { version = "1", features = ["derive"] }
+
+# Concurrency
+dashmap = "6"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# HTTP and WebSocket
+axum = { version = "0.7", features = ["ws"] }
+tokio-tungstenite = "0.24"
+futures-util = "0.3"
+
+# WebTransport (experimental)
+wtransport = "0.6"
+
+# Configuration
+toml = "0.8"
+config = "0.14"
+
+# Metrics
+metrics = "0.23"
+metrics-exporter-prometheus = "0.15"
+
+# Error handling
+thiserror = "1"
+anyhow = "1"
+
+# Async traits
+async-trait = "0.1"
+
+# Testing and benchmarking
+criterion = { version = "0.5", features = ["html_reports"] }
+
+# Internal crates
+pulse-core = { path = "crates/pulse-core" }
+pulse-protocol = { path = "crates/pulse-protocol" }
+pulse-transport = { path = "crates/pulse-transport" }
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.bench]
+debug = true

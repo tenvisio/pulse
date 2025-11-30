@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse Web Client</title>
+    <script src="https://unpkg.com/@msgpack/msgpack@2.8.0/dist.es5+umd/msgpack.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --accent: #00ff88;
+            --accent-dim: #00cc6a;
+            --accent-glow: rgba(0, 255, 136, 0.15);
+            --text-primary: #e8e8ed;
+            --text-secondary: #8b8b96;
+            --border: #2a2a36;
+            --error: #ff4466;
+            --warning: #ffaa00;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 20% 0%, rgba(0, 255, 136, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(0, 200, 100, 0.05) 0%, transparent 50%);
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--error);
+            box-shadow: 0 0 10px var(--error);
+            transition: all 0.3s ease;
+        }
+        
+        .status-dot.connected {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+        
+        .status-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        input, button {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        input {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        
+        input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        button.secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        button.secondary:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        
+        .messages {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .message {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .message:last-child {
+            border-bottom: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-time {
+            color: var(--text-secondary);
+            margin-right: 0.75rem;
+        }
+        
+        .message-type {
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        
+        .message-type.sent { color: #00ccff; }
+        .message-type.received { color: var(--accent); }
+        .message-type.system { color: var(--warning); }
+        .message-type.error { color: var(--error); }
+        
+        .subscriptions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .subscription-tag {
+            background: var(--accent-glow);
+            border: 1px solid var(--accent-dim);
+            color: var(--accent);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .subscription-tag button {
+            background: none;
+            border: none;
+            color: var(--accent);
+            padding: 0;
+            font-size: 1rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .subscription-tag button:hover {
+            color: var(--error);
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .help-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        footer {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 2rem;
+            font-size: 0.85rem;
+        }
+        
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ Pulse Web Client</h1>
+            <p class="subtitle">Real-time WebSocket messaging demo</p>
+        </header>
+        
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">
+                    <span class="status-dot" id="statusDot"></span>
+                    Connection
+                </span>
+                <span class="status-text" id="statusText">Disconnected</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="serverUrl" value="ws://127.0.0.1:8080/ws" placeholder="WebSocket URL">
+                <button id="connectBtn" onclick="toggleConnection()">Connect</button>
+            </div>
+            <p class="help-text">Default: ws://127.0.0.1:8080/ws (pulse-server)</p>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📡 Subscribe</span>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="channelInput" value="chat:lobby" placeholder="Channel name">
+                    <button onclick="subscribe()" id="subscribeBtn" disabled>Subscribe</button>
+                </div>
+                <div class="subscriptions" id="subscriptions"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📤 Publish</span>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="publishChannel" value="chat:lobby" placeholder="Channel">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="messageInput" placeholder="Message to send..." onkeypress="handleKeyPress(event)">
+                    <button onclick="publish()" id="publishBtn" disabled>Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">📨 Messages</span>
+                <button class="secondary" onclick="clearMessages()">Clear</button>
+            </div>
+            <div class="messages" id="messages">
+                <div class="message">
+                    <span class="message-type system">SYSTEM</span>
+                    <span>Ready to connect. Start pulse-server first: cargo run --release -p pulse-server</span>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Built with <a href="https://github.com/tenvisio/pulse">Pulse</a> — The world's fastest realtime engine</p>
+        </footer>
+    </div>
+
+    <script>
+        let ws = null;
+        let messageId = 0;
+        const subscriptions = new Set();
+        
+        function getTime() {
+            return new Date().toLocaleTimeString('en-US', { hour12: false });
+        }
+        
+        function addMessage(type, text) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'message';
+            div.innerHTML = `
+                <span class="message-time">${getTime()}</span>
+                <span class="message-type ${type}">${type.toUpperCase()}</span>
+                <span>${escapeHtml(text)}</span>
+            `;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+            addMessage('system', 'Messages cleared');
+        }
+        
+        function updateStatus(connected) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            const btn = document.getElementById('connectBtn');
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            const publishBtn = document.getElementById('publishBtn');
+            
+            if (connected) {
+                dot.classList.add('connected');
+                text.textContent = 'Connected';
+                btn.textContent = 'Disconnect';
+                subscribeBtn.disabled = false;
+                publishBtn.disabled = false;
+            } else {
+                dot.classList.remove('connected');
+                text.textContent = 'Disconnected';
+                btn.textContent = 'Connect';
+                subscribeBtn.disabled = true;
+                publishBtn.disabled = true;
+            }
+        }
+        
+        function toggleConnection() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.close();
+            } else {
+                connect();
+            }
+        }
+        
+        function connect() {
+            const url = document.getElementById('serverUrl').value;
+            addMessage('system', `Connecting to ${url}...`);
+            
+            try {
+                ws = new WebSocket(url);
+                ws.binaryType = 'arraybuffer';
+                
+                ws.onopen = () => {
+                    addMessage('system', 'Connected successfully!');
+                    updateStatus(true);
+                };
+                
+                ws.onclose = () => {
+                    addMessage('system', 'Connection closed');
+                    updateStatus(false);
+                    subscriptions.clear();
+                    renderSubscriptions();
+                };
+                
+                ws.onerror = (error) => {
+                    addMessage('error', 'Connection error');
+                    console.error('WebSocket error:', error);
+                };
+                
+                ws.onmessage = (event) => {
+                    try {
+                        const data = new Uint8Array(event.data);
+                        // Skip 4-byte length prefix
+                        if (data.length < 4) {
+                            addMessage('error', 'Message too short');
+                            return;
+                        }
+                        const payload = data.slice(4);
+                        const frame = MessagePack.decode(payload);
+                        handleFrame(frame);
+                    } catch (e) {
+                        addMessage('error', `Failed to decode message: ${e.message}`);
+                        console.error('Decode error:', e);
+                    }
+                };
+            } catch (e) {
+                addMessage('error', `Failed to connect: ${e.message}`);
+            }
+        }
+        
+        function handleFrame(frame) {
+            console.log('Received frame:', frame);
+            
+            if (frame.type === 'publish' || frame.type === 'Publish') {
+                const channel = frame.channel;
+                let payload = frame.payload;
+                
+                // Try to decode payload if it's binary
+                if (payload instanceof Uint8Array) {
+                    try {
+                        payload = MessagePack.decode(payload);
+                    } catch {
+                        payload = new TextDecoder().decode(payload);
+                    }
+                }
+                
+                if (typeof payload === 'object') {
+                    payload = JSON.stringify(payload);
+                }
+                
+                addMessage('received', `[${channel}] ${payload}`);
+            } else if (frame.type === 'ack' || frame.type === 'Ack') {
+                addMessage('system', `Acknowledged: ID ${frame.id}`);
+            } else if (frame.type === 'error' || frame.type === 'Error') {
+                addMessage('error', `Error: ${frame.message || frame.error}`);
+            } else if (frame.type === 'connected' || frame.type === 'Connected') {
+                addMessage('system', `Server assigned connection ID: ${frame.connection_id}`);
+            } else {
+                addMessage('received', JSON.stringify(frame));
+            }
+        }
+        
+        function subscribe() {
+            const channel = document.getElementById('channelInput').value.trim();
+            if (!channel) return;
+            if (subscriptions.has(channel)) {
+                addMessage('system', `Already subscribed to ${channel}`);
+                return;
+            }
+            
+            const frame = {
+                type: 'subscribe',
+                id: ++messageId,
+                channel: channel
+            };
+            
+            sendFrame(frame);
+            subscriptions.add(channel);
+            renderSubscriptions();
+            addMessage('sent', `Subscribe to: ${channel}`);
+        }
+        
+        function unsubscribe(channel) {
+            const frame = {
+                type: 'unsubscribe',
+                id: ++messageId,
+                channel: channel
+            };
+            
+            sendFrame(frame);
+            subscriptions.delete(channel);
+            renderSubscriptions();
+            addMessage('sent', `Unsubscribe from: ${channel}`);
+        }
+        
+        function publish() {
+            const channel = document.getElementById('publishChannel').value.trim();
+            const message = document.getElementById('messageInput').value.trim();
+            if (!channel || !message) return;
+            
+            const frame = {
+                type: 'publish',
+                channel: channel,
+                payload: MessagePack.encode({ text: message, time: Date.now() })
+            };
+            
+            sendFrame(frame);
+            addMessage('sent', `[${channel}] ${message}`);
+            document.getElementById('messageInput').value = '';
+        }
+        
+        function sendFrame(frame) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                addMessage('error', 'Not connected');
+                return;
+            }
+            
+            const encoded = MessagePack.encode(frame);
+            // Add 4-byte big-endian length prefix
+            const withPrefix = new Uint8Array(4 + encoded.length);
+            const view = new DataView(withPrefix.buffer);
+            view.setUint32(0, encoded.length, false); // big-endian
+            withPrefix.set(encoded, 4);
+            ws.send(withPrefix);
+        }
+        
+        function renderSubscriptions() {
+            const container = document.getElementById('subscriptions');
+            container.innerHTML = '';
+            
+            for (const channel of subscriptions) {
+                const tag = document.createElement('div');
+                tag.className = 'subscription-tag';
+                tag.innerHTML = `
+                    <span>${escapeHtml(channel)}</span>
+                    <button onclick="unsubscribe('${escapeHtml(channel)}')">&times;</button>
+                `;
+                container.appendChild(tag);
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                publish();
+            }
+        }
+    </script>
+</body>
+</html>
+

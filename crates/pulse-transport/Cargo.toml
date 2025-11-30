@@ -1,0 +1,35 @@
+[package]
+name = "pulse-transport"
+description = "Transport abstraction layer for Pulse (WebSocket, WebTransport)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[features]
+default = ["websocket"]
+websocket = ["tokio-tungstenite"]
+webtransport = ["wtransport"]
+
+[dependencies]
+pulse-protocol = { workspace = true }
+bytes = { workspace = true }
+tokio = { workspace = true }
+futures-util = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+axum = { workspace = true }
+
+# Optional transports
+tokio-tungstenite = { workspace = true, optional = true }
+wtransport = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
+
+
+
+
+
