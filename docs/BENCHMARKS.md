@@ -21,16 +21,38 @@ cargo bench -p pulse-protocol --bench codec
 cargo bench -p pulse-bench -- --test
 ```
 
+### Viewing Benchmark Reports
+
+Criterion generates interactive HTML reports with graphs and statistics:
+
+```bash
+# After running benchmarks, open the report in your browser
+open target/criterion/report/index.html        # macOS
+xdg-open target/criterion/report/index.html    # Linux
+start target/criterion/report/index.html       # Windows
+```
+
+Individual benchmark reports are also available at:
+```
+target/criterion/<benchmark_name>/report/index.html
+```
+
+The reports include:
+- Performance distribution graphs
+- Comparison with previous runs
+- Statistical analysis (mean, median, std dev)
+- Outlier detection
+
 ### End-to-End Throughput Benchmark
 
 Measures actual WebSocket message throughput with real network I/O:
 
 ```bash
-# Terminal 1: Start the server
-cargo run --release -p pulse-server
+# Terminal 1: Start the server (with minimal logging for accurate results)
+RUST_LOG=error cargo run --release -p pulse-server
 
 # Terminal 2: Run e2e benchmark (default: 16 clients)
-cargo run --release -p pulse-bench --bin e2e_throughput
+RUST_LOG=error cargo run --release -p pulse-bench --bin e2e_throughput
 
 # With custom client count
 cargo run --release -p pulse-bench --bin e2e_throughput -- 64
@@ -42,6 +64,24 @@ The e2e benchmark:
 - All clients subscribe to a shared "benchmark" channel
 - Each client publishes messages while receiving from others
 - Measures total message throughput over a 10-second window
+
+### Benchmarking Tips
+
+For accurate and reproducible results:
+
+```bash
+# Always use release mode
+cargo bench                    # Criterion uses release by default
+cargo run --release            # For e2e benchmarks
+
+# Minimize logging overhead
+RUST_LOG=error cargo run ...   # Suppress info/debug logs
+
+# Close other applications to reduce system noise
+# Run multiple times to account for variance
+```
+
+**Why `RUST_LOG=error`?** Even when logs are filtered out, the logging macros still evaluate arguments and check log levels. This adds measurable overhead that can skew benchmark results.
 
 ## Results
 
