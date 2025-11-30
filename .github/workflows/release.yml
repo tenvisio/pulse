@@ -81,24 +81,23 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+          merge-multiple: true
 
       - name: Create checksums
         run: |
           cd artifacts
-          for dir in */; do
-            cd "$dir"
-            sha256sum * > checksums.txt
-            cd ..
-          done
+          sha256sum * > checksums.txt
+          cat checksums.txt
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: |
-            artifacts/**/*
+          files: artifacts/*
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
     name: Publish to crates.io
