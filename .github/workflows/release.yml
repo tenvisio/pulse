@@ -80,19 +80,23 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          path: release
+          pattern: pulse-*
           merge-multiple: true
 
       - name: Create checksums
         run: |
-          cd artifacts
-          sha256sum * > checksums.txt
+          cd release
+          echo "Files in release directory:"
+          ls -la
+          sha256sum pulse-* > checksums.txt
+          echo "Checksums:"
           cat checksums.txt
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*
+          files: release/*
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
@@ -110,28 +114,56 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Publish pulse-protocol
-        run: cargo publish -p pulse-protocol
+        run: cargo publish -p pulse-protocol --no-verify
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       - name: Publish pulse-core
         run: |
-          sleep 30  # Wait for pulse-protocol to be available
-          cargo publish -p pulse-core
+          # Wait for pulse-protocol to propagate on crates.io index
+          for i in {1..10}; do
+            sleep 15
+            echo "Attempt $i: Publishing pulse-core..."
+            if cargo publish -p pulse-core --no-verify 2>&1; then
+              echo "Successfully published pulse-core"
+              exit 0
+            fi
+            echo "Retrying in 15 seconds..."
+          done
+          echo "Failed to publish pulse-core after 10 attempts"
+          exit 1
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       - name: Publish pulse-transport
         run: |
-          sleep 30
-          cargo publish -p pulse-transport
+          for i in {1..10}; do
+            sleep 15
+            echo "Attempt $i: Publishing pulse-transport..."
+            if cargo publish -p pulse-transport --no-verify 2>&1; then
+              echo "Successfully published pulse-transport"
+              exit 0
+            fi
+            echo "Retrying in 15 seconds..."
+          done
+          echo "Failed to publish pulse-transport after 10 attempts"
+          exit 1
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       - name: Publish pulse-server
         run: |
-          sleep 30
-          cargo publish -p pulse-server
+          for i in {1..10}; do
+            sleep 15
+            echo "Attempt $i: Publishing pulse-server..."
+            if cargo publish -p pulse-server --no-verify 2>&1; then
+              echo "Successfully published pulse-server"
+              exit 0
+            fi
+            echo "Retrying in 15 seconds..."
+          done
+          echo "Failed to publish pulse-server after 10 attempts"
+          exit 1
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 

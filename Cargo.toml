@@ -60,10 +60,10 @@ async-trait = "0.1"
 # Testing and benchmarking
 criterion = { version = "0.5", features = ["html_reports"] }
 
-# Internal crates
-pulse-core = { path = "crates/pulse-core" }
-pulse-protocol = { path = "crates/pulse-protocol" }
-pulse-transport = { path = "crates/pulse-transport" }
+# Internal crates (version required for crates.io, path for local dev)
+pulse-core = { version = "0.1.0", path = "crates/pulse-core" }
+pulse-protocol = { version = "0.1.0", path = "crates/pulse-protocol" }
+pulse-transport = { version = "0.1.0", path = "crates/pulse-transport" }
 
 [profile.release]
 lto = true
