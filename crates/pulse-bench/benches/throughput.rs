@@ -4,8 +4,8 @@
 
 use bytes::Bytes;
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
-use tenvis_pulse_core::{Message, Router};
 use pulse_protocol::{codec, Frame};
+use tenvis_pulse_core::{Message, Router};
 
 /// Benchmark frame encoding.
 fn bench_encode(c: &mut Criterion) {

@@ -3,9 +3,9 @@
 //! These benchmarks focus on measuring end-to-end latency.
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use tenvis_pulse_core::{Message, Router};
 use pulse_protocol::{codec, Frame};
 use std::time::Instant;
+use tenvis_pulse_core::{Message, Router};
 
 /// Benchmark round-trip encode/decode latency.
 fn bench_codec_roundtrip(c: &mut Criterion) {
