@@ -16,7 +16,7 @@ use axum::{
 };
 use bytes::BytesMut;
 use futures_util::{SinkExt, StreamExt};
-use pulse_core::{Router as PulseRouter, RouterConfig};
+use tenvis_pulse_core::{Router as PulseRouter, RouterConfig};
 use pulse_protocol::{codec, Frame};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -138,7 +138,7 @@ async fn handle_websocket(socket: WebSocket, state: Arc<AppState>) {
 
     // Create a merged stream for all subscription receivers
     let (sub_tx, mut sub_rx) =
-        tokio::sync::mpsc::unbounded_channel::<(String, Arc<pulse_core::Message>)>();
+        tokio::sync::mpsc::unbounded_channel::<(String, Arc<tenvis_pulse_core::Message>)>();
 
     // Message processing loop
     loop {
@@ -237,7 +237,7 @@ async fn handle_frame(
     state: &Arc<AppState>,
     sender: &mut futures_util::stream::SplitSink<WebSocket, Message>,
     subscription_tasks: &mut HashMap<String, tokio::task::JoinHandle<()>>,
-    sub_tx: &tokio::sync::mpsc::UnboundedSender<(String, Arc<pulse_core::Message>)>,
+    sub_tx: &tokio::sync::mpsc::UnboundedSender<(String, Arc<tenvis_pulse_core::Message>)>,
 ) -> Result<()> {
     match frame {
         Frame::Subscribe { id, channel } => {
@@ -302,7 +302,7 @@ async fn handle_frame(
         } => {
             debug!(connection = %connection_id, channel = %channel, "Publish");
 
-            let mut message = pulse_core::Message::new(channel.clone(), payload.clone())
+            let mut message = tenvis_pulse_core::Message::new(channel.clone(), payload.clone())
                 .with_source(connection_id);
 
             if let Some(evt) = event {

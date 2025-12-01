@@ -1,5 +1,5 @@
 [package]
-name = "pulse-server"
+name = "tenvis-pulse-server"
 description = "High-performance realtime communication server"
 version.workspace = true
 edition.workspace = true
@@ -12,9 +12,9 @@ name = "pulse"
 path = "src/main.rs"
 
 [dependencies]
-pulse-core = { workspace = true }
+tenvis-pulse-core = { workspace = true }
 pulse-protocol = { workspace = true }
-pulse-transport = { workspace = true }
+tenvis-pulse-transport = { workspace = true }
 bytes = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }

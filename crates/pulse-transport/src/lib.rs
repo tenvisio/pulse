@@ -13,7 +13,7 @@
 //! allowing the server to be protocol-agnostic.
 //!
 //! ```rust,ignore
-//! use pulse_transport::{Transport, Connection};
+//! use tenvis_pulse_transport::{Transport, Connection};
 //!
 //! async fn handle_connection(mut conn: Box<dyn Connection>) {
 //!     while let Ok(frame) = conn.recv().await {

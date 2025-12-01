@@ -1,5 +1,5 @@
 [package]
-name = "pulse-bench"
+name = "tenvis-pulse-bench"
 description = "Benchmarks for Pulse realtime engine"
 version.workspace = true
 edition.workspace = true
@@ -12,7 +12,7 @@ publish = false
 bench = false
 
 [dependencies]
-pulse-core = { workspace = true }
+tenvis-pulse-core = { workspace = true }
 pulse-protocol = { workspace = true }
 bytes = { workspace = true }
 criterion = { workspace = true }

@@ -1,5 +1,5 @@
 [package]
-name = "pulse-core"
+name = "tenvis-pulse-core"
 description = "Core types, traits, and message routing for Pulse"
 version.workspace = true
 edition.workspace = true

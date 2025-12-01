@@ -4,7 +4,7 @@
 
 use bytes::Bytes;
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
-use pulse_core::{Message, Router};
+use tenvis_pulse_core::{Message, Router};
 use pulse_protocol::{codec, Frame};
 
 /// Benchmark frame encoding.
@@ -119,7 +119,7 @@ fn bench_router(c: &mut Criterion) {
 
 /// Benchmark channel operations.
 fn bench_channel(c: &mut Criterion) {
-    use pulse_core::Channel;
+    use tenvis_pulse_core::Channel;
 
     let mut group = c.benchmark_group("channel");
 

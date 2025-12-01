@@ -9,7 +9,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 rust-version = "1.75"
 license = "MIT OR Apache-2.0"
@@ -61,9 +61,9 @@ async-trait = "0.1"
 criterion = { version = "0.5", features = ["html_reports"] }
 
 # Internal crates (version required for crates.io, path for local dev)
-pulse-core = { version = "0.1.0", path = "crates/pulse-core" }
-pulse-protocol = { version = "0.1.0", path = "crates/pulse-protocol" }
-pulse-transport = { version = "0.1.0", path = "crates/pulse-transport" }
+tenvis-pulse-core = { version = "0.1.1", path = "crates/pulse-core" }
+pulse-protocol = { version = "0.1.1", path = "crates/pulse-protocol" }
+tenvis-pulse-transport = { version = "0.1.1", path = "crates/pulse-transport" }
 
 [profile.release]
 lto = true

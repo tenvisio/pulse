@@ -1,5 +1,5 @@
 [package]
-name = "pulse-transport"
+name = "tenvis-pulse-transport"
 description = "Transport abstraction layer for Pulse (WebSocket, WebTransport)"
 version.workspace = true
 edition.workspace = true
