@@ -1,8 +1,8 @@
 # Pulse
 
 [![CI](https://github.com/tenvisio/pulse/workflows/CI/badge.svg)](https://github.com/tenvisio/pulse/actions)
-[![Crates.io](https://img.shields.io/crates/v/pulse-server.svg)](https://crates.io/crates/pulse-server)
-[![Documentation](https://docs.rs/pulse-core/badge.svg)](https://docs.rs/pulse-core)
+[![Crates.io](https://img.shields.io/crates/v/tenvis-pulse-server.svg)](https://crates.io/crates/tenvis-pulse-server)
+[![Documentation](https://docs.rs/tenvis-pulse-core/badge.svg)](https://docs.rs/tenvis-pulse-core)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE-MIT)
 
 **The world's fastest realtime communication engine for web and edge applications.**
@@ -24,7 +24,7 @@ Pulse is a high-performance, transport-agnostic pub/sub messaging system built i
 
 ```bash
 # From crates.io
-cargo install pulse-server
+cargo install tenvis-pulse-server
 
 # From source
 git clone https://github.com/tenvisio/pulse
@@ -104,10 +104,10 @@ Messages use MessagePack encoding with a 4-byte length prefix. Here's the messag
 | Crate | Description |
 |-------|-------------|
 | [`pulse-protocol`](crates/pulse-protocol) | Wire protocol definitions and codec |
-| [`pulse-core`](crates/pulse-core) | Router, channels, and presence |
-| [`pulse-transport`](crates/pulse-transport) | Transport abstractions (WebSocket, WebTransport) |
-| [`pulse-server`](crates/pulse-server) | The server binary |
-| [`pulse-bench`](crates/pulse-bench) | Performance benchmarks |
+| [`tenvis-pulse-core`](crates/pulse-core) | Router, channels, and presence |
+| [`tenvis-pulse-transport`](crates/pulse-transport) | Transport abstractions (WebSocket, WebTransport) |
+| [`tenvis-pulse-server`](crates/pulse-server) | The server binary |
+| [`tenvis-pulse-bench`](crates/pulse-bench) | Performance benchmarks |
 
 ## Configuration
 
@@ -167,21 +167,21 @@ Run benchmarks:
 
 ```bash
 # Run micro-benchmarks (Criterion)
-cargo bench -p pulse-bench
+cargo bench -p tenvis-pulse-bench
 
 # Run specific benchmark file
-cargo bench -p pulse-bench --bench throughput
-cargo bench -p pulse-bench --bench latency
+cargo bench -p tenvis-pulse-bench --bench throughput
+cargo bench -p tenvis-pulse-bench --bench latency
 
 # Run end-to-end throughput test (requires server running)
 # Terminal 1: Start the server
-cargo run --release -p pulse-server
+cargo run --release -p tenvis-pulse-server
 
 # Terminal 2: Run e2e benchmark with 16 clients (default)
-cargo run --release -p pulse-bench --bin e2e_throughput
+cargo run --release -p tenvis-pulse-bench --bin e2e_throughput
 
 # Or with custom client count
-cargo run --release -p pulse-bench --bin e2e_throughput -- 64
+cargo run --release -p tenvis-pulse-bench --bin e2e_throughput -- 64
 ```
 
 ### Results
